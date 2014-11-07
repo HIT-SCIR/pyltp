@@ -67,7 +67,7 @@ $ cd ..
 编译LTP以后，请使用如下命令编译pyltp
 
 ```
-$ cmake -DLTP_HOME=/path/to/your/ltp/project .
+$ cmake -D LTP_HOME=/path/to/your/ltp/project .
 $ make
 ```
 
