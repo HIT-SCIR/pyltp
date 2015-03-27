@@ -57,6 +57,8 @@ extra_compile_args = []
 
 if sys.platform == 'win32':
     extra_compile_args += ['/DBOOST_PYTHON_SOURCE', '/DBOOST_PYTHON_STATIC_LIB', '/EHsc']
+elif sys.platform == 'cygwin':
+    extra_compile_args += ['-DBOOST_PYTHON_SOURCE', '-DBOOST_PYTHON_STATIC_LIB']
 elif sys.platform == 'darwin':
     extra_compile_args += ['']
 
@@ -69,7 +71,7 @@ ext_modules = [Extension('pyltp',
 
 setup(
     name='pyltp',
-    version='0.1.5',
+    version='0.1.6',
     description='pyltp: the python extension for LTP',
     long_description=codecs.open('README.rst', encoding='utf-8').read(),
     author='Yijia Liu, Zixiang Xu',
