@@ -1,9 +1,13 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import glob
 import os
 import sys
 import codecs
 from setuptools import setup, Extension
+import zipfile
+import urllib
+import time
 
 ltp_root="ltp"
 ltp_source=os.path.join(ltp_root, "src")
@@ -111,3 +115,44 @@ setup(
     #packages=['pyltp'],
     ext_modules=ext_modules
 )
+
+
+# download process
+def process(block_num, block_size, total_size):
+    percent = block_num * block_size / total_size
+    percent_num = int(percent * 100)
+    view = '\r [%-100s]%d%%' % ('=' * percent_num, percent_num)
+    sys.stdout.write(view)
+    sys.stdout.flush()
+
+
+# download ltp_data
+data_url = 'http://ospm9rsnd.bkt.clouddn.com/model/ltp_data_v3.4.0.zip'
+data_name = 'ltp_data_v3.4.0.zip'
+data_dir = 'ltp_data_v3.4.0'
+if not os.path.exists(data_dir):
+    # 下载模型数据文件
+    print('Downloading ltp model files...This may take a while...')
+    finished = False
+    try_times = 4
+    while try_times > 0 and finished is False:
+        try:
+            if sys.version_info.major == 2:
+                data_path, _ = urllib.urlretrieve(data_url, data_name)
+                finished = True
+            elif sys.version_info.major > 2:
+                data_path, _ = urllib.request.urlretrieve(data_url, data_name, process)
+                finished = True
+            statinfo = os.stat(data_path)
+            print('\nSuccessfully downloaded', data_name, statinfo.st_size, 'bytes.')
+            # # extract data into data_dir
+            print('Extracting ltp_data...')
+            data = zipfile.ZipFile(data_path)
+            data.extractall(path=os.getcwd())
+            print('Successfully extracted' + data_name)
+        except Exception as e:
+            try_times = try_times - 1
+            print('Retrying to download\t' + 'times to retry:' + str(try_times) + str(e))
+            time.sleep(2)
+    if try_times == 0 and finished is False:
+        print('Download failed. Please download ltp_data manually at http://ltp.ai/download.html')
