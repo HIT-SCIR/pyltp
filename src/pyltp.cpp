@@ -13,6 +13,7 @@
 #include <iostream>
 #include <vector>
 #include <boost/python.hpp>
+#include <boost/python/scope.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "SplitSentence.h"
 #include "segment_dll.h"
@@ -21,6 +22,7 @@
 #include "ner_dll.h"
 #include "SRL_DLL.h"
 
+const std::string PYLTP_VERSION = "0.2.1";
 
 template <class T>
 std::vector<T> py_list_to_std_vector(const boost::python::list& l){
@@ -348,6 +350,8 @@ BOOST_PYTHON_MODULE(pyltp)
 {
   using namespace boost::python;
 
+  scope().attr("__version__") = PYLTP_VERSION;
+  
   class_<ParseResult>("ParseResult")
     .def_readwrite("head",     &ParseResult::first)
     .def_readwrite("relation", &ParseResult::second);
