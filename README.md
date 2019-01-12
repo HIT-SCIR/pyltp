@@ -55,7 +55,7 @@ segmentor.release()
 
 * 第二步，下载模型文件
 
-	[七牛云](http://ltp.ai/download.html)，当前模型版本 3.4.0
+	[百度云](http://pan.baidu.com/share/link?shareid=1988562907&uk=2738088569)，当前模型版本 3.4.0
 
 ## 版本对应
 
