@@ -51,6 +51,7 @@ segmentor.release()
 	$ git submodule init
 	$ git submodule update
 	$ python setup.py install # Mac系统出现版本问题使用 MACOSX_DEPLOYMENT_TARGET=10.7 python setup.py install
+                                  # 编译时间较长（约5分钟左右），请耐心等待
 	```
 
 * 第二步，下载模型文件
