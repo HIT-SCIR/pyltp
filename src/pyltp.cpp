@@ -3,38 +3,32 @@
  *
  *  @author: HuangFJ <biohfj@gmail.com>
  *
- * This project forks from https://github.com/HuangFJ/pyltp. The basic structure of
- * the project is perserved. But interface is adopted from XML level to library level
- * to allow more flexible usage.
+ * This project forks from https://github.com/HuangFJ/pyltp. The basic structure
+ * of the project is perserved. But interface is adopted from XML level to
+ * library level to allow more flexible usage.
  *
  *  @author: Yijia Liu <yjliu@ir.hit.edu.cn>
  *  @author: Zixiang Xu <zxxu@ir.hit.edu.cn>
+ *  @author: Yang Liu <yliu@ir.hit.edu.cn>
+ *  @author: YunLong Feng <ylfeng@ir.hit.edu.cn>
  */
+#include "ltp/ner_dll.h"
+#include "ltp/parser_dll.h"
+#include "ltp/postag_dll.h"
+#include "ltp/segment_dll.h"
+#include "ltp/SplitSentence.h"
+#include "ltp/srl_dll.h"
 #include <iostream>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <vector>
-#include <boost/python.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include "SplitSentence.h"
-#include "segment_dll.h"
-#include "postag_dll.h"
-#include "parser_dll.h"
-#include "ner_dll.h"
-#include "SRL_DLL.h"
 
-
-template <class T>
-std::vector<T> py_list_to_std_vector(const boost::python::list& l){
-  std::vector<T> v;
-  for(int i = 0; i < len(l); ++i){
-    v.push_back(boost::python::extract<T>(l[i]));
-  }
-  return v;
-}
+namespace py = pybind11;
 
 struct SentenceSplitter {
   SentenceSplitter() {}
 
-  static std::vector<std::string> split(const std::string& paragraph) {
+  static std::vector<std::string> split(const std::string &paragraph) {
     std::vector<std::string> ret;
     SplitSentence(paragraph, ret);
     return ret;
@@ -42,10 +36,9 @@ struct SentenceSplitter {
 };
 
 struct Segmentor {
-  Segmentor()
-    : model(NULL) {}
+  Segmentor() : model(NULL) {}
 
-  void load(const std::string& model_path) {
+  void load(const std::string &model_path) {
     if (model == NULL) {
       model = segmentor_create_segmentor(model_path.c_str());
     } else {
@@ -53,15 +46,18 @@ struct Segmentor {
     }
   }
 
-  void load_with_lexicon(const std::string& model_path, const std::string& lexicon_path) {
+  void load_with_lexicon(const std::string &model_path,
+                         const std::string &lexicon_path,
+                         const std::string &force_lexicon_file) {
     if (model == NULL) {
-      model = segmentor_create_segmentor(model_path.c_str(), lexicon_path.c_str());
+      model = segmentor_create_segmentor(
+          model_path.c_str(), lexicon_path.c_str(), force_lexicon_file.c_str());
     } else {
       std::cerr << "Segmentor: Model reloaded!" << std::endl;
     }
   }
 
-  std::vector<std::string> segment(const std::string& sentence) {
+  std::vector<std::string> segment(const std::string &sentence) {
     std::vector<std::string> ret;
     if (model == NULL) {
       std::cerr << "Segmentor: Model not loaded!" << std::endl;
@@ -78,40 +74,35 @@ struct Segmentor {
     }
   }
 
-  void * model;
+  void *model;
 };
 
 struct CustomizedSegmentor {
-  CustomizedSegmentor()
-    : model(NULL) {}
+  CustomizedSegmentor() : model(NULL) {}
 
-  void load(
-      const std::string& base_model_path,
-      const std::string& customized_model_path) {
+  void load(const std::string &base_model_path,
+            const std::string &customized_model_path) {
     if (model == NULL) {
       model = customized_segmentor_create_segmentor(
-          base_model_path.c_str(),
-          customized_model_path.c_str());
+          base_model_path.c_str(), customized_model_path.c_str());
     } else {
       std::cerr << "CustomizedSegmentor: Model reloaded!" << std::endl;
     }
   }
 
-  void load_with_lexicon(
-      const std::string& base_model_path,
-      const std::string& customized_model_path,
-      const std::string& lexicon_path) {
+  void load_with_lexicon(const std::string &base_model_path,
+                         const std::string &customized_model_path,
+                         const std::string &lexicon_path) {
     if (model == NULL) {
       model = customized_segmentor_create_segmentor(
-          base_model_path.c_str(),
-          customized_model_path.c_str(),
+          base_model_path.c_str(), customized_model_path.c_str(),
           lexicon_path.c_str());
     } else {
       std::cerr << "CustomizedSegmentor: Model reloaded!" << std::endl;
     }
   }
 
-  std::vector<std::string> segment(const std::string& sentence) {
+  std::vector<std::string> segment(const std::string &sentence) {
     std::vector<std::string> ret;
     if (model == NULL) {
       std::cerr << "CustomizedSegmentor: Model not loaded!" << std::endl;
@@ -128,15 +119,13 @@ struct CustomizedSegmentor {
     }
   }
 
-  void * model;
+  void *model;
 };
 
-
 struct Postagger {
-  Postagger()
-    : model(NULL) {}
+  Postagger() : model(NULL) {}
 
-  void load(const std::string& model_path) {
+  void load(const std::string &model_path) {
     if (model == NULL) {
       model = postagger_create_postagger(model_path.c_str());
     } else {
@@ -144,15 +133,17 @@ struct Postagger {
     }
   }
 
-  void load_with_lexicon(const std::string& model_path, const std::string& lexicon_path) {
+  void load_with_lexicon(const std::string &model_path,
+                         const std::string &lexicon_path) {
     if (model == NULL) {
-      model = postagger_create_postagger(model_path.c_str(), lexicon_path.c_str());
+      model =
+          postagger_create_postagger(model_path.c_str(), lexicon_path.c_str());
     } else {
       std::cerr << "Postagger: Model reloaded!" << std::endl;
     }
   }
 
-  std::vector<std::string> postag(const std::vector<std::string>& words) {
+  std::vector<std::string> postag(const std::vector<std::string> &words) {
     std::vector<std::string> ret;
     if (model == NULL) {
       std::cerr << "Postagger: Model not loaded!" << std::endl;
@@ -162,10 +153,6 @@ struct Postagger {
     return ret;
   }
 
-  std::vector<std::string> postag(const boost::python::list& words) {
-    return postag(py_list_to_std_vector<std::string>(words));
-  }
-
   void release() {
     if (model != NULL) {
       postagger_release_postagger(model);
@@ -173,17 +160,15 @@ struct Postagger {
     }
   }
 
-  void * model;
+  void *model;
 };
-
 
 typedef std::pair<int, std::string> ParseResult;
 
 struct Parser {
-  Parser()
-    : model(NULL) {}
+  Parser() : model(NULL) {}
 
-  void load(const std::string& model_path) {
+  void load(const std::string &model_path) {
     if (model == NULL) {
       model = parser_create_parser(model_path.c_str());
     } else {
@@ -191,11 +176,11 @@ struct Parser {
     }
   }
 
-  std::vector<ParseResult> parse(const std::vector<std::string>& words,
-      const std::vector<std::string>& postags) {
+  std::vector<ParseResult> parse(const std::vector<std::string> &words,
+                                 const std::vector<std::string> &postags) {
     std::vector<ParseResult> ret;
-    std::vector<int>          heads;
-    std::vector<std::string>  relations;
+    std::vector<int> heads;
+    std::vector<std::string> relations;
 
     if (model == NULL) {
       std::cerr << "Parser: Model not loaded!" << std::endl;
@@ -203,24 +188,11 @@ struct Parser {
       parser_parse(model, words, postags, heads, relations);
     }
 
-    for (std::size_t i = 0; i < heads.size(); ++ i) {
+    for (std::size_t i = 0; i < heads.size(); ++i) {
       ret.push_back(ParseResult(heads[i], relations[i]));
     }
     return ret;
   }
-
-  std::vector<ParseResult> parse(const std::vector<std::string>& words, const boost::python::list& postags){
-    return parse(words, py_list_to_std_vector<std::string>(postags));
-  }
-
-  std::vector<ParseResult> parse(const boost::python::list& words, const std::vector<std::string>& postags){
-    return parse(py_list_to_std_vector<std::string>(words), postags);
-  }
-
-  std::vector<ParseResult> parse(const boost::python::list& words, const boost::python::list& postags){
-    return parse(py_list_to_std_vector<std::string>(words), py_list_to_std_vector<std::string>(postags));
-  }
-
 
   void release() {
     if (model != NULL) {
@@ -229,15 +201,13 @@ struct Parser {
     }
   }
 
-  void * model;
+  void *model;
 };
 
-
 struct NamedEntityRecognizer {
-  NamedEntityRecognizer()
-    : model(NULL) {}
+  NamedEntityRecognizer() : model(NULL) {}
 
-  void load(const std::string& model_path) {
+  void load(const std::string &model_path) {
     if (model == NULL) {
       model = ner_create_recognizer(model_path.c_str());
     } else {
@@ -245,8 +215,8 @@ struct NamedEntityRecognizer {
     }
   }
 
-  std::vector<std::string> recognize(const std::vector<std::string>& words,
-      const std::vector<std::string>& postags) {
+  std::vector<std::string> recognize(const std::vector<std::string> &words,
+                                     const std::vector<std::string> &postags) {
     std::vector<std::string> netags;
     if (model == NULL) {
       std::cerr << "NER: Model not loaded!" << std::endl;
@@ -256,18 +226,6 @@ struct NamedEntityRecognizer {
     return netags;
   }
 
-  std::vector<std::string> recognize(const std::vector<std::string>& words, const boost::python::list& postags){
-    return recognize(words, py_list_to_std_vector<std::string>(postags));
-  }
-
-  std::vector<std::string> recognize(const boost::python::list& words, const std::vector<std::string>& postags){
-    return recognize(py_list_to_std_vector<std::string>(words), postags);
-  }
-
-  std::vector<std::string> recognize(const boost::python::list& words, const boost::python::list& postags){
-    return recognize(py_list_to_std_vector<std::string>(words), py_list_to_std_vector<std::string>(postags));
-  }
-
   void release() {
     if (model != NULL) {
       ner_release_recognizer(model);
@@ -275,32 +233,29 @@ struct NamedEntityRecognizer {
     }
   }
 
-  void * model;
+  void *model;
 };
 
-typedef std::pair<int, int>                 ArgRange;
-typedef std::pair<std::string, ArgRange>    Arg;
-typedef std::pair<int, std::vector<Arg> >   SementicRole;
+typedef std::pair<int, int> ArgRange;
+typedef std::pair<std::string, ArgRange> Arg;
+typedef std::pair<int, std::vector<Arg>> SementicRole;
 
 struct SementicRoleLabeller {
-  SementicRoleLabeller()
-    : loaded(false) {}
+  SementicRoleLabeller() : loaded(false) {}
 
-  void load(const std::string& model_path) {
+  void load(const std::string &model_path) {
     loaded = (srl_load_resource(model_path) == 0);
   }
 
-  std::vector<SementicRole> label(
-      const std::vector<std::string>& words,
-      const std::vector<std::string>& postags,
-      const std::vector<ParseResult>& parse
-      ) {
+  std::vector<SementicRole> label(const std::vector<std::string> &words,
+                                  const std::vector<std::string> &postags,
+                                  const std::vector<ParseResult> &parse) {
     std::vector<SementicRole> ret;
 
     // Some trick
     std::vector<ParseResult> tmp_parse(parse);
-    for (std::size_t i = 0; i < tmp_parse.size(); ++ i) {
-      tmp_parse[i].first --;
+    for (std::size_t i = 0; i < tmp_parse.size(); ++i) {
+      tmp_parse[i].first--;
     }
     if (!loaded) {
       std::cerr << "SRL: Model not loaded!" << std::endl;
@@ -308,38 +263,6 @@ struct SementicRoleLabeller {
       srl_dosrl(words, postags, tmp_parse, ret);
     }
     return ret;
-  }
-
-  std::vector<SementicRole> label(
-      const std::vector<std::string>& words,
-      const boost::python::list& postags,
-      const std::vector<ParseResult>& parse
-      ) {
-    return label(words, py_list_to_std_vector<std::string>(postags), parse);
-  }
-
-  std::vector<SementicRole> label(
-      const boost::python::list& words,
-      const std::vector<std::string>& postags,
-      const std::vector<ParseResult>& parse
-      ) {
-    return label(py_list_to_std_vector<std::string>(words), postags, parse);
-  }
-
-  std::vector<SementicRole> label(
-      const boost::python::list& words,
-      const boost::python::list& postags,
-      const std::vector<ParseResult>& parse
-      ) {
-    return label(py_list_to_std_vector<std::string>(words), py_list_to_std_vector<std::string>(postags), parse);
-  }
-
-  std::vector<SementicRole> label(
-      const boost::python::list& words,
-      const boost::python::list& postags,
-      const boost::python::list& parse
-      ) {
-    return label(words, postags, py_list_to_std_vector<ParseResult>(parse));
   }
 
   void release() {
@@ -351,91 +274,104 @@ struct SementicRoleLabeller {
   bool loaded;
 };
 
+#ifdef SDPG
+#include "ltp/lstm_sdparser_dll.h"
 
-BOOST_PYTHON_MODULE(pyltp)
-{
-  using namespace boost::python;
+typedef std::pair<std::string, int> SemanticArc;
+typedef std::vector<SemanticArc> SemanticNode;
 
-  class_<ParseResult>("ParseResult")
-    .def_readwrite("head",     &ParseResult::first)
-    .def_readwrite("relation", &ParseResult::second);
+struct SDGraphParser {
 
-  class_<ArgRange>("ArgRange")
-    .def_readwrite("start",    &ArgRange::first)
-    .def_readwrite("end",      &ArgRange::second);
+  void load(const std::string &model_path) {
+    if (model == NULL) {
+      model = lstmsdparser_create_parser(model_path.c_str());
+    } else {
+      std::cerr << "SDGraphParser: Model reloaded!" << std::endl;
+    }
+  }
 
-  class_<Arg>("Arg")
-    .def_readwrite("name",     &Arg::first)
-    .def_readwrite("range",    &Arg::second);
+  std::vector<SemanticNode> parse(const std::vector<std::string> &words,
+                                  const std::vector<std::string> &postags) {
+    std::vector<std::vector<std::string>> vecSemResult;
+    std::vector<SemanticNode> ret;
+    if (model == NULL) {
+      std::cerr << "SDGraphParser: Model not loaded!" << std::endl;
+    } else {
+      lstmsdparser_parse(model, words, postags, vecSemResult);
+    }
+    for (int i = 0; i < vecSemResult.size(); i++) {
+      SemanticNode node;
+      for (int j = 0; j < vecSemResult[i].size(); j++) {
+        if (vecSemResult[i][j] != "-NULL-") {
+          node.push_back(SemanticArc(
+              vecSemResult[i][j], j < vecSemResult[i].size() - 1 ? j + 1 : -1));
+        }
+      }
+      ret.push_back(node);
+    }
+    return ret;
+  }
 
-  class_<std::vector<Arg> >("Args")
-    .def(vector_indexing_suite<std::vector<Arg> >() );
+  void release() {
+    if (model != NULL) {
+      lstmsdparser_release_parser(model);
+      model = NULL;
+    }
+  }
 
-  class_<SementicRole >("SementicRole")
-    .def_readwrite("index",     &SementicRole::first)
-    .def_readwrite("arguments", &SementicRole::second);
+  void *model;
+};
+#endif
 
-  class_<std::vector<SementicRole> >("SementicRoles")
-    .def(vector_indexing_suite<std::vector<SementicRole> >() );
+PYBIND11_MODULE(pyltp, m) {
+  py::class_<SentenceSplitter>(m, "SentenceSplitter")
+      .def(py::init<>())
+      .def_static("split", &SentenceSplitter::split);
 
-  class_<std::vector<std::string> >("VectorOfString")
-    .def(vector_indexing_suite<std::vector<std::string> >() );
+  py::class_<Segmentor>(m, "Segmentor")
+      .def(py::init<>())
+      .def("load", &Segmentor::load)
+      .def("load_with_lexicon", &Segmentor::load_with_lexicon)
+      .def("segment", &Segmentor::segment)
+      .def("release", &Segmentor::release);
 
-  class_<std::vector<ParseResult > >("VectorOfParseResult")
-    .def(vector_indexing_suite<std::vector<ParseResult> >() );
+  py::class_<CustomizedSegmentor>(m, "CustomizedSegmentor")
+      .def(py::init<>())
+      .def("load", &CustomizedSegmentor::load)
+      .def("load_with_lexicon", &CustomizedSegmentor::load_with_lexicon)
+      .def("segment", &CustomizedSegmentor::segment)
+      .def("release", &CustomizedSegmentor::release);
 
-  class_<SentenceSplitter>("SentenceSplitter")
-    .def("split", &SentenceSplitter::split)
-    .staticmethod("split")
-    ;
+  py::class_<Postagger>(m, "Postagger")
+      .def(py::init<>())
+      .def("load", &Postagger::load)
+      .def("load_with_lexicon", &Postagger::load_with_lexicon)
+      .def("postag", &Postagger::postag)
+      .def("release", &Postagger::release);
 
-  class_<Segmentor>("Segmentor")
-    .def("load", &Segmentor::load)
-    .def("load_with_lexicon", &Segmentor::load_with_lexicon)
-    .def("segment", &Segmentor::segment)
-    .def("release", &Segmentor::release)
-    ;
+  py::class_<Parser>(m, "Parser")
+      .def(py::init<>())
+      .def("load", &Parser::load)
+      .def("parse", &Parser::parse)
+      .def("release", &Parser::release);
 
-  class_<CustomizedSegmentor>("CustomizedSegmentor")
-    .def("load", &CustomizedSegmentor::load)
-    .def("load_with_lexicon", &CustomizedSegmentor::load_with_lexicon)
-    .def("segment", &CustomizedSegmentor::segment)
-    .def("release", &CustomizedSegmentor::release)
-    ;
+  py::class_<NamedEntityRecognizer>(m, "NamedEntityRecognizer")
+      .def(py::init<>())
+      .def("load", &NamedEntityRecognizer::load)
+      .def("recognize",&NamedEntityRecognizer::recognize)
+      .def("release", &NamedEntityRecognizer::release);
 
-  class_<Postagger>("Postagger")
-    .def("load", &Postagger::load)
-    .def("load_with_lexicon", &Postagger::load_with_lexicon)
-    .def("postag", static_cast<std::vector<std::string> (Postagger::*)(const std::vector<std::string>&)>(&Postagger::postag))
-    .def("postag", static_cast<std::vector<std::string> (Postagger::*)(const boost::python::list&)>(&Postagger::postag))
-    .def("release", &Postagger::release)
-    ;
-
-  class_<Parser>("Parser")
-    .def("load", &Parser::load)
-    .def("parse", static_cast<std::vector<ParseResult> (Parser::*)(const std::vector<std::string>&, const std::vector<std::string>&)>(&Parser::parse))
-    .def("parse", static_cast<std::vector<ParseResult> (Parser::*)(const std::vector<std::string>&, const boost::python::list&)>(&Parser::parse))
-    .def("parse", static_cast<std::vector<ParseResult> (Parser::*)(const boost::python::list&, const std::vector<std::string>&)>(&Parser::parse))
-    .def("parse", static_cast<std::vector<ParseResult> (Parser::*)(const boost::python::list&, const boost::python::list&)>(&Parser::parse))
-    .def("release", &Parser::release)
-    ;
-
-  class_<NamedEntityRecognizer>("NamedEntityRecognizer")
-    .def("load", &NamedEntityRecognizer::load)
-    .def("recognize", static_cast<std::vector<std::string> (NamedEntityRecognizer::*)(const std::vector<std::string>&, const std::vector<std::string>&)>(&NamedEntityRecognizer::recognize))
-    .def("recognize", static_cast<std::vector<std::string> (NamedEntityRecognizer::*)(const std::vector<std::string>&, const boost::python::list&)>(&NamedEntityRecognizer::recognize))
-    .def("recognize", static_cast<std::vector<std::string> (NamedEntityRecognizer::*)(const boost::python::list&, const std::vector<std::string>&)>(&NamedEntityRecognizer::recognize))
-    .def("recognize", static_cast<std::vector<std::string> (NamedEntityRecognizer::*)(const boost::python::list&, const boost::python::list&)>(&NamedEntityRecognizer::recognize))
-    .def("release", &NamedEntityRecognizer::release)
-    ;
-
-  class_<SementicRoleLabeller>("SementicRoleLabeller")
-    .def("load", &SementicRoleLabeller::load)
-    .def("label", static_cast<std::vector<SementicRole> (SementicRoleLabeller::*)(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<ParseResult>&)>(&SementicRoleLabeller::label))
-    .def("label", static_cast<std::vector<SementicRole> (SementicRoleLabeller::*)(const std::vector<std::string>&, const boost::python::list&, const std::vector<ParseResult>&)>(&SementicRoleLabeller::label))
-    .def("label", static_cast<std::vector<SementicRole> (SementicRoleLabeller::*)(const boost::python::list&, const std::vector<std::string>&, const std::vector<ParseResult>&)>(&SementicRoleLabeller::label))
-    .def("label", static_cast<std::vector<SementicRole> (SementicRoleLabeller::*)(const boost::python::list&, const boost::python::list&, const std::vector<ParseResult>&)>(&SementicRoleLabeller::label))
-    .def("label", static_cast<std::vector<SementicRole> (SementicRoleLabeller::*)(const boost::python::list&, const boost::python::list&, const boost::python::list&)>(&SementicRoleLabeller::label))
-    .def("release", &SementicRoleLabeller::release)
-    ;
+  py::class_<SementicRoleLabeller>(m, "SementicRoleLabeller")
+      .def(py::init<>())
+      .def("load", &SementicRoleLabeller::load)
+      .def("label",&SementicRoleLabeller::label)
+//      .def("pi",&SementicRoleLabeller::pi)
+      .def("release", &SementicRoleLabeller::release);
+#ifdef SDPG
+  py::class_<SDGraphParser>(m, "SDGraphParser")
+      .def(py::init<>())
+      .def("load", &SDGraphParser::load)
+      .def("parse",&SDGraphParser::parse)
+      .def("release", &SDGraphParser::release);
+#endif
 }

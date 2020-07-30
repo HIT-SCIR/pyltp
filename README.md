@@ -11,12 +11,8 @@ pyltp 是 [语言技术平台（Language Technology Platform, LTP）](https://gi
 在使用 pyltp 之前，您需要简要了解 [语言技术平台（LTP）](http://ltp.readthedocs.org/zh_CN/latest/) 能否帮助您解决问题。
 
 ## 依赖支持情况
-|               | Py2.6 | Py2.6 | Py3.4 | Py3.5 | Py3.6 | conda-python |
-| :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| Linux         | 支持   | 支持  | 支持   | 支持   | 支持  | 不支持  |
-| Mac OS        | 支持   | 支持  | 支持   | 支持   | 支持  | 不支持  |
-| Windows VS2015| 不支持 | 不支持 | 不支持 | 支持   | 支持  | 不支持  |
-| Windows VS2017| 不支持 | 不支持 | 不支持 | 支持   | 支持  | 不支持  |
+
+Python 2.7, 3.x, and PyPy (PyPy2.7 >= 5.7)
 
 ## 一个简单的例子
 
@@ -28,7 +24,7 @@ from pyltp import Segmentor
 segmentor = Segmentor()
 segmentor.load("/path/to/your/cws/model")
 words = segmentor.segment("元芳你怎么看")
-print "|".join(words)
+print("|".join(words))
 segmentor.release()
 ```
 除了分词之外，pyltp 还提供词性标注、命名实体识别、依存句法分析、语义角色标注等功能。
@@ -60,14 +56,23 @@ segmentor.release()
 
 	[七牛云](http://ltp.ai/download.html)，当前模型版本 3.4.0
 
+## 制作安装包
+
+```
+git submodule init
+git submodule update
+python setup.py bdist_wheel
+```
+
 ## 版本对应
 
-* pyltp 版本：0.2.0
+* pyltp 版本：0.3.0
 * LTP 版本：3.4.0
 * 模型版本：3.4.0
 
 ## 作者
 
+* 冯云龙 << ylfeng@ir.hit.edu.cn >> 2020-7-30 重写代码，换用 Pybind11
 * 徐梓翔 << zxxu@ir.hit.edu.cn >> 2015-01-20 解决跨平台运行问题
 * 刘一佳 << yjliu@ir.hit.edu.cn >> 2014-06-12 重组项目
 * HuangFJ << biohfj@gmail.com >> 本项目最初作者
