@@ -324,6 +324,12 @@ struct SDGraphParser {
 #endif
 
 PYBIND11_MODULE(pyltp, m) {
+#ifdef VERSION_INFO
+  m.attr("__version__") = VERSION_INFO;
+#else
+  m.attr("__version__") = "dev";
+#endif
+
   py::class_<SentenceSplitter>(m, "SentenceSplitter")
       .def(py::init<>())
       .def_static("split", &SentenceSplitter::split);

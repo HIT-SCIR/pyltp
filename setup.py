@@ -62,11 +62,11 @@ class CMakeBuild(build_ext):
 setup(
     name='pyltp',
     version='0.3.0',
-    description='pyltp: the python extension for LTP',
+    description='pyltp: the python extension for LTP 3',
     long_description=codecs.open('README.md', encoding='utf-8').read(),
     author='Yijia Liu, Zixiang Xu, Yang Liu, Yunlong Feng',
-    author_email='ltp-cloud@googlegroups.com',
-    url='https://github.com/HIT-SCIR/pyltp_graphsdp',
+    author_email='ylfeng@ir.hit.edu.cn',
+    url='https://github.com/HIT-SCIR/pyltp',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
