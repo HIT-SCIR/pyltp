@@ -11,6 +11,9 @@ on:
 
 jobs:
   build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -53,7 +56,6 @@ jobs:
             compiler: clang
             version: "11.0"
 
-    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2
         with:
