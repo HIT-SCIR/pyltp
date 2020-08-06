@@ -14,6 +14,11 @@ pyltp 是 [语言技术平台（Language Technology Platform, LTP）](https://gi
 
 Python 2.7, 3.x, and PyPy (PyPy2.7 >= 5.7)
 
+目前已知可编译环境，欢迎补充
+
++ ubuntu-18.04-gcc-4.8
++ macOS-10.15-clang-11.0
+
 ## 一个简单的例子
 
 下面是一个使用 pyltp 进行分词的例子
