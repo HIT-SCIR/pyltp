@@ -20,16 +20,17 @@ jobs:
         # Github Actions requires a single row to be added to the build matrix.
         # See https://help.github.com/en/articles/workflow-syntax-for-github-actions.
         name: [
-          ubuntu-20.04-gcc-9.3.0,
+          ubuntu-20.04-gcc-9,
           windows-2016-cl,
           macOS-10.15-clang-11.0,
         ]
+        python-version: [3.6, 3.7, 3.8]
 
         include:
-          - name: ubuntu-20.04-gcc-9.3.0
+          - name: ubuntu-20.04-gcc-9
             os: ubuntu-20.04
             compiler: gcc
-            version: "9.3.0"
+            version: "9"
 
           - name: windows-2016-cl
             os: windows-2016
