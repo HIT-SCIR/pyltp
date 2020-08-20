@@ -15,31 +15,43 @@ if __name__ == '__main__':
 
     sentence = SentenceSplitter.split(paragraph)[0]
 
-    segmentor = Segmentor()
-    segmentor.load(os.path.join(MODELDIR, "cws.model"))
+    segmentor = Segmentor(os.path.join(MODELDIR, "cws.model"))
+
+    segmentor_with_vocab = Segmentor(
+        os.path.join(MODELDIR, "cws.model"),
+        lexicon_path='lexicon.txt',  # 分开的会合并在一起
+    )
+
+    segmentor_with_force_vocab = Segmentor(
+        os.path.join(MODELDIR, "cws.model"),
+        force_lexicon_path='lexicon.txt'  # 除上述功能外，原本合并在一起的亦会拆分
+    )
+
     words = segmentor.segment(sentence)
     print("\t".join(words))
 
-    postagger = Postagger()
-    postagger.load(os.path.join(MODELDIR, "pos.model"))
+    words_with_vocab = segmentor_with_vocab.segment(sentence)
+    print("\t".join(words_with_vocab), "\t\t| With Vocab")
+
+    words_with_force_vocab = segmentor_with_force_vocab.segment(sentence)
+    print("\t".join(words_with_force_vocab), "\t| Force Vocab")
+
+    postagger = Postagger(os.path.join(MODELDIR, "pos.model"))
     postags = postagger.postag(words)
     # list-of-string parameter is support in 0.1.5
     # postags = postagger.postag(["中国","进出口","银行","与","中国银行","加强","合作"])
     print("\t".join(postags))
 
-    parser = Parser()
-    parser.load(os.path.join(MODELDIR, "parser.model"))
+    parser = Parser(os.path.join(MODELDIR, "parser.model"))
     arcs = parser.parse(words, postags)
 
     print("\t".join("%d:%s" % (head, relation) for (head, relation) in arcs))
 
-    recognizer = NamedEntityRecognizer()
-    recognizer.load(os.path.join(MODELDIR, "ner.model"))
+    recognizer = NamedEntityRecognizer(os.path.join(MODELDIR, "ner.model"))
     netags = recognizer.recognize(words, postags)
     print("\t".join(netags))
 
-    labeller = SementicRoleLabeller()
-    labeller.load(os.path.join(MODELDIR, "pisrl.model"))
+    labeller = SementicRoleLabeller(os.path.join(MODELDIR, "pisrl.model"))
     roles = labeller.label(words, postags, arcs)
 
     for index, arguments in roles:

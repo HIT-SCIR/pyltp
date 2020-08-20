@@ -36,25 +36,10 @@ struct SentenceSplitter {
 };
 
 struct Segmentor {
-  Segmentor() : model(NULL) {}
-
-  void load(const std::string &model_path) {
-    if (model == NULL) {
-      model = segmentor_create_segmentor(model_path.c_str());
-    } else {
-      std::cerr << "Segmentor: Model reloaded!" << std::endl;
-    }
-  }
-
-  void load_with_lexicon(const std::string &model_path,
-                         const std::string &lexicon_path,
-                         const std::string &force_lexicon_file) {
-    if (model == NULL) {
-      model = segmentor_create_segmentor(
-          model_path.c_str(), lexicon_path.c_str(), force_lexicon_file.c_str());
-    } else {
-      std::cerr << "Segmentor: Model reloaded!" << std::endl;
-    }
+  Segmentor(const char *model_path,
+            const char *lexicon_path = nullptr,
+            const char *force_lexicon_file = nullptr) : model(NULL) {
+    load(model_path, lexicon_path, force_lexicon_file);
   }
 
   std::vector<std::string> segment(const std::string &sentence) {
@@ -75,31 +60,24 @@ struct Segmentor {
   }
 
   void *model;
+
+private:
+  void load(const char *model_path,
+            const char *lexicon_path = nullptr,
+            const char *force_lexicon_file = nullptr) {
+    if (model == NULL) {
+      model = segmentor_create_segmentor(model_path, lexicon_path, force_lexicon_file);
+    } else {
+      std::cerr << "Segmentor: Model reloaded!" << std::endl;
+    }
+  }
 };
 
 struct CustomizedSegmentor {
-  CustomizedSegmentor() : model(NULL) {}
-
-  void load(const std::string &base_model_path,
-            const std::string &customized_model_path) {
-    if (model == NULL) {
-      model = customized_segmentor_create_segmentor(
-          base_model_path.c_str(), customized_model_path.c_str());
-    } else {
-      std::cerr << "CustomizedSegmentor: Model reloaded!" << std::endl;
-    }
-  }
-
-  void load_with_lexicon(const std::string &base_model_path,
-                         const std::string &customized_model_path,
-                         const std::string &lexicon_path) {
-    if (model == NULL) {
-      model = customized_segmentor_create_segmentor(
-          base_model_path.c_str(), customized_model_path.c_str(),
-          lexicon_path.c_str());
-    } else {
-      std::cerr << "CustomizedSegmentor: Model reloaded!" << std::endl;
-    }
+  CustomizedSegmentor(const char *base_model_path,
+                      const char *customized_model_path = nullptr,
+                      const char *lexicon_path = nullptr) : model(NULL) {
+    load(base_model_path, customized_model_path, lexicon_path);
   }
 
   std::vector<std::string> segment(const std::string &sentence) {
@@ -120,27 +98,22 @@ struct CustomizedSegmentor {
   }
 
   void *model;
+
+private:
+  void load(const char *base_model_path,
+            const char *customized_model_path = nullptr,
+            const char *lexicon_path = nullptr) {
+    if (model == NULL) {
+      model = customized_segmentor_create_segmentor(base_model_path, customized_model_path, lexicon_path);
+    } else {
+      std::cerr << "CustomizedSegmentor: Model reloaded!" << std::endl;
+    }
+  }
 };
 
 struct Postagger {
-  Postagger() : model(NULL) {}
-
-  void load(const std::string &model_path) {
-    if (model == NULL) {
-      model = postagger_create_postagger(model_path.c_str());
-    } else {
-      std::cerr << "Postagger: Model reloaded!" << std::endl;
-    }
-  }
-
-  void load_with_lexicon(const std::string &model_path,
-                         const std::string &lexicon_path) {
-    if (model == NULL) {
-      model =
-          postagger_create_postagger(model_path.c_str(), lexicon_path.c_str());
-    } else {
-      std::cerr << "Postagger: Model reloaded!" << std::endl;
-    }
+  Postagger(const char *model_path, const char *lexicon_path = nullptr) : model(NULL) {
+    load(model_path, lexicon_path);
   }
 
   std::vector<std::string> postag(const std::vector<std::string> &words) {
@@ -161,19 +134,22 @@ struct Postagger {
   }
 
   void *model;
+private:
+  void load(const char *model_path, const char *lexicon_path = nullptr) {
+    if (model == NULL) {
+      model =
+          postagger_create_postagger(model_path, lexicon_path);
+    } else {
+      std::cerr << "Postagger: Model reloaded!" << std::endl;
+    }
+  }
 };
 
 typedef std::pair<int, std::string> ParseResult;
 
 struct Parser {
-  Parser() : model(NULL) {}
-
-  void load(const std::string &model_path) {
-    if (model == NULL) {
-      model = parser_create_parser(model_path.c_str());
-    } else {
-      std::cerr << "Parser: Model reloaded!" << std::endl;
-    }
+  Parser(const char *model_path) : model(NULL) {
+    load(model_path);
   }
 
   std::vector<ParseResult> parse(const std::vector<std::string> &words,
@@ -202,17 +178,19 @@ struct Parser {
   }
 
   void *model;
+private:
+  void load(const char *model_path) {
+    if (model == NULL) {
+      model = parser_create_parser(model_path);
+    } else {
+      std::cerr << "Parser: Model reloaded!" << std::endl;
+    }
+  }
 };
 
 struct NamedEntityRecognizer {
-  NamedEntityRecognizer() : model(NULL) {}
-
-  void load(const std::string &model_path) {
-    if (model == NULL) {
-      model = ner_create_recognizer(model_path.c_str());
-    } else {
-      std::cerr << "NER: Model reloaded!" << std::endl;
-    }
+  NamedEntityRecognizer(const char *model_path) : model(NULL) {
+    load(model_path);
   }
 
   std::vector<std::string> recognize(const std::vector<std::string> &words,
@@ -234,6 +212,14 @@ struct NamedEntityRecognizer {
   }
 
   void *model;
+private:
+  void load(const char *model_path) {
+    if (model == NULL) {
+      model = ner_create_recognizer(model_path);
+    } else {
+      std::cerr << "NER: Model reloaded!" << std::endl;
+    }
+  }
 };
 
 typedef std::pair<int, int> ArgRange;
@@ -241,10 +227,8 @@ typedef std::pair<std::string, ArgRange> Arg;
 typedef std::pair<int, std::vector<Arg>> SementicRole;
 
 struct SementicRoleLabeller {
-  SementicRoleLabeller() : loaded(false) {}
-
-  void load(const std::string &model_path) {
-    loaded = (srl_load_resource(model_path) == 0);
+  SementicRoleLabeller(const char *model_path) : loaded(false) {
+    load(model_path);
   }
 
   std::vector<SementicRole> label(const std::vector<std::string> &words,
@@ -272,6 +256,10 @@ struct SementicRoleLabeller {
   }
 
   bool loaded;
+private:
+  void load(const char *model_path) {
+    loaded = (srl_load_resource(model_path) == 0);
+  }
 };
 
 #ifdef SDPG
@@ -335,42 +323,47 @@ PYBIND11_MODULE(pyltp, m) {
       .def_static("split", &SentenceSplitter::split);
 
   py::class_<Segmentor>(m, "Segmentor")
-      .def(py::init<>())
-      .def("load", &Segmentor::load)
-      .def("load_with_lexicon", &Segmentor::load_with_lexicon)
+      .def(
+          py::init<const char *, const char *, const char *>(),
+          "Init Segmentor",
+          py::arg("model_path"),
+          py::arg("lexicon_path") = nullptr,
+          py::arg("force_lexicon_path") = nullptr
+      )
       .def("segment", &Segmentor::segment)
       .def("release", &Segmentor::release);
 
   py::class_<CustomizedSegmentor>(m, "CustomizedSegmentor")
-      .def(py::init<>())
-      .def("load", &CustomizedSegmentor::load)
-      .def("load_with_lexicon", &CustomizedSegmentor::load_with_lexicon)
+      .def(py::init<const char *, const char *, const char *>(),
+           "Init CustomizedSegmentor",
+           py::arg("base_model_path"),
+           py::arg("customized_model_path") = nullptr,
+           py::arg("lexicon_path") = nullptr
+      )
       .def("segment", &CustomizedSegmentor::segment)
       .def("release", &CustomizedSegmentor::release);
 
   py::class_<Postagger>(m, "Postagger")
-      .def(py::init<>())
-      .def("load", &Postagger::load)
-      .def("load_with_lexicon", &Postagger::load_with_lexicon)
+      .def(py::init<const char *, const char *>(),
+           "Init Postagger",
+           py::arg("model_path") = nullptr,
+           py::arg("lexicon_path") = nullptr)
       .def("postag", &Postagger::postag)
       .def("release", &Postagger::release);
 
   py::class_<Parser>(m, "Parser")
-      .def(py::init<>())
-      .def("load", &Parser::load)
+      .def(py::init<const char *>())
       .def("parse", &Parser::parse)
       .def("release", &Parser::release);
 
   py::class_<NamedEntityRecognizer>(m, "NamedEntityRecognizer")
-      .def(py::init<>())
-      .def("load", &NamedEntityRecognizer::load)
-      .def("recognize",&NamedEntityRecognizer::recognize)
+      .def(py::init<const char *>())
+      .def("recognize", &NamedEntityRecognizer::recognize)
       .def("release", &NamedEntityRecognizer::release);
 
   py::class_<SementicRoleLabeller>(m, "SementicRoleLabeller")
-      .def(py::init<>())
-      .def("load", &SementicRoleLabeller::load)
-      .def("label",&SementicRoleLabeller::label)
+      .def(py::init<const char *>())
+      .def("label", &SementicRoleLabeller::label)
 //      .def("pi",&SementicRoleLabeller::pi)
       .def("release", &SementicRoleLabeller::release);
 #ifdef SDPG
