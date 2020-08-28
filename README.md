@@ -21,15 +21,14 @@ Python 2.7, 3.x, and PyPy (PyPy2.7 >= 5.7)
 ```python
 # -*- coding: utf-8 -*-
 from pyltp import Segmentor
-segmentor = Segmentor()
-segmentor.load("/path/to/your/cws/model")
+segmentor = Segmentor("/path/to/your/cws/model")
 words = segmentor.segment("元芳你怎么看")
 print("|".join(words))
 segmentor.release()
 ```
 除了分词之外，pyltp 还提供词性标注、命名实体识别、依存句法分析、语义角色标注等功能。
 
-详细使用方法请参考 [在线文档](http://pyltp.readthedocs.io/)。
+详细使用方法可以参考 [example](example/example.py)
 
 ## 安装
 
