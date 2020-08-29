@@ -21,7 +21,7 @@ jobs:
         # See https://help.github.com/en/articles/workflow-syntax-for-github-actions.
         name: [
           ubuntu-20.04-gcc-9,
-          windows-2016-cl,
+          windows-2016-msvc-2017,
           macOS-10.15-clang-11.0,
         ]
         python-version: [3.6, 3.7, 3.8]
@@ -32,10 +32,10 @@ jobs:
             compiler: gcc
             version: "9"
 
-          - name: windows-2016-cl
+          - name: windows-2016-msvc-2017
             os: windows-2016
             compiler: cl
-            version: "14.0"
+            version: "14.16"
 
           - name: macOS-10.15-clang-11.0
             os: macOS-10.15
