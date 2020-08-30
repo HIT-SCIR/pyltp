@@ -331,7 +331,12 @@ PYBIND11_MODULE(pyltp, m) {
           py::arg("force_lexicon_path") = nullptr
       )
       .def("segment", &Segmentor::segment)
-      .def("release", &Segmentor::release);
+      .def("release", &Segmentor::release)
+      .def("__enter__",
+           [&](Segmentor &s) { return s; }, "Enter the runtime context related to this object")
+      .def("__exit__",
+           [&](Segmentor &s, py::object exc_type, py::object exc_value, py::object traceback) { s.release(); },
+           "Exit the runtime context related to this object");
 
   py::class_<CustomizedSegmentor>(m, "CustomizedSegmentor")
       .def(py::init<const char *, const char *, const char *>(),
@@ -341,7 +346,12 @@ PYBIND11_MODULE(pyltp, m) {
            py::arg("lexicon_path") = nullptr
       )
       .def("segment", &CustomizedSegmentor::segment)
-      .def("release", &CustomizedSegmentor::release);
+      .def("release", &CustomizedSegmentor::release)
+      .def("__enter__",
+           [&](CustomizedSegmentor &s) { return s; }, "Enter the runtime context related to this object")
+      .def("__exit__",
+           [&](CustomizedSegmentor &s, py::object exc_type, py::object exc_value, py::object traceback) { s.release(); },
+           "Exit the runtime context related to this object");
 
   py::class_<Postagger>(m, "Postagger")
       .def(py::init<const char *, const char *>(),
@@ -349,28 +359,53 @@ PYBIND11_MODULE(pyltp, m) {
            py::arg("model_path") = nullptr,
            py::arg("lexicon_path") = nullptr)
       .def("postag", &Postagger::postag)
-      .def("release", &Postagger::release);
+      .def("release", &Postagger::release)
+      .def("__enter__",
+           [&](Postagger &s) { return s; }, "Enter the runtime context related to this object")
+      .def("__exit__",
+           [&](Postagger &s, py::object exc_type, py::object exc_value, py::object traceback) { s.release(); },
+           "Exit the runtime context related to this object");
 
   py::class_<Parser>(m, "Parser")
       .def(py::init<const char *>())
       .def("parse", &Parser::parse)
-      .def("release", &Parser::release);
+      .def("release", &Parser::release)
+      .def("__enter__",
+           [&](Parser &s) { return s; }, "Enter the runtime context related to this object")
+      .def("__exit__",
+           [&](Parser &s, py::object exc_type, py::object exc_value, py::object traceback) { s.release(); },
+           "Exit the runtime context related to this object");
 
   py::class_<NamedEntityRecognizer>(m, "NamedEntityRecognizer")
       .def(py::init<const char *>())
       .def("recognize", &NamedEntityRecognizer::recognize)
-      .def("release", &NamedEntityRecognizer::release);
+      .def("release", &NamedEntityRecognizer::release)
+      .def("__enter__",
+           [&](NamedEntityRecognizer &s) { return s; }, "Enter the runtime context related to this object")
+      .def("__exit__",
+           [&](NamedEntityRecognizer &s, py::object exc_type, py::object exc_value, py::object traceback) { s.release(); },
+           "Exit the runtime context related to this object");
 
   py::class_<SementicRoleLabeller>(m, "SementicRoleLabeller")
       .def(py::init<const char *>())
-      .def("label", &SementicRoleLabeller::label)
 //      .def("pi",&SementicRoleLabeller::pi)
-      .def("release", &SementicRoleLabeller::release);
+      .def("label", &SementicRoleLabeller::label)
+      .def("release", &SementicRoleLabeller::release)
+      .def("__enter__",
+           [&](SementicRoleLabeller &s) { return s; }, "Enter the runtime context related to this object")
+      .def("__exit__",
+           [&](SementicRoleLabeller &s, py::object exc_type, py::object exc_value, py::object traceback) { s.release(); },
+           "Exit the runtime context related to this object");
 #ifdef SDPG
   py::class_<SDGraphParser>(m, "SDGraphParser")
       .def(py::init<>())
       .def("load", &SDGraphParser::load)
       .def("parse",&SDGraphParser::parse)
-      .def("release", &SDGraphParser::release);
+      .def("release", &SDGraphParser::release)
+      .def("__enter__",
+           [&](SDGraphParser &s) { return s; }, "Enter the runtime context related to this object")
+      .def("__exit__",
+           [&](SDGraphParser &s, py::object exc_type, py::object exc_value, py::object traceback) { s.release(); },
+           "Exit the runtime context related to this object");
 #endif
 }

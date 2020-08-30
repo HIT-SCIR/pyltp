@@ -16,6 +16,11 @@ if __name__ == '__main__':
     # --------------------- 断句 ------------------------
     sentence = SentenceSplitter.split(paragraph)[0]
 
+    # -------------------- Context Manager -------------
+    with Segmentor(os.path.join(MODELDIR, "cws.model")) as s:
+        words = s.segment(sentence)
+        print("\t".join(words))
+
     # --------------------- 分词 ------------------------
     segmentor = Segmentor(os.path.join(MODELDIR, "cws.model"))
 
@@ -63,6 +68,9 @@ if __name__ == '__main__':
     for index, arguments in roles:
         print(index, " ".join(["%s: (%d,%d)" % (name, start, end) for (name, (start, end)) in arguments]))
 
+    segmentor.release()
+    segmentor_with_vocab.release()
+    segmentor_with_force_vocab.release()
     segmentor.release()
     postagger.release()
     parser.release()

@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(pyltp)
 
-add_subdirectory(ltp)
+set(PYBIND11_CPP_STANDARD -std=c++14)
 add_subdirectory(pybind11)
+add_subdirectory(ltp)
 
 add_library(pyltp MODULE src/pyltp.cpp)
 target_link_libraries(
