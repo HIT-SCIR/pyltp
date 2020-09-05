@@ -57,5 +57,5 @@ jobs:
           python setup.py bdist_wheel
       - name: Install wheels
         run: |
-          echo "::set-env name=WHEEL_NAME::$(python setup.py -q bdist_wheel_name)
+          echo "::set-env name=WHEEL_NAME::$(python setup.py -q bdist_wheel_name)"
           python -m pip install dist/${{ WHEEL_NAME }}
