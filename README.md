@@ -10,6 +10,8 @@ pyltp 是 [语言技术平台（Language Technology Platform, LTP）](https://gi
 
 在使用 pyltp 之前，您需要简要了解 [语言技术平台（LTP）](http://ltp.readthedocs.org/zh_CN/latest/) 能否帮助您解决问题。
 
+**目前基于Pytorch的LTP4 已经发布，而PyLTP将会只有非常有限的维护，请大家移步使用**[LTP 4]([LTP 4](https://github.com/HIT-SCIR/ltp))
+
 ## 依赖支持情况
 
 Python 2.7, 3.x, and PyPy (PyPy2.7 >= 5.7)
