@@ -67,7 +67,7 @@ python setup.py bdist_wheel
 
 ## 版本对应
 
-* pyltp 版本：0.3.0
+* pyltp 版本：0.4.0
 * LTP 版本：3.4.0
 * 模型版本：3.4.0
 
