@@ -45,6 +45,7 @@ segmentor.release()
 
 	```
 	$ git clone https://github.com/HIT-SCIR/pyltp
+	$ cd pyltp
 	$ git submodule init
 	$ git submodule update
 	$ python setup.py install
